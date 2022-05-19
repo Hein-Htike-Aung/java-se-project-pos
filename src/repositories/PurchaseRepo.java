@@ -9,7 +9,7 @@ public interface PurchaseRepo {
 
     void createPurchase(Purchase purchase);
 
-    void createPurchaseDetails(PurchaseDetails purchaseDetails);
+    void createPurchaseDetails(List<PurchaseDetails> purchaseDetailsList);
 
     Purchase findPurchaseById(String id);
 
@@ -19,5 +19,7 @@ public interface PurchaseRepo {
 
     List<Purchase> findPurchaseListByEmployeeId(String employeeId);
 
-    List<PurchaseDetails> findPurcahseDetialsListByProductId(String productId);
+    List<PurchaseDetails> findPurchaseDetailsListByProductId(String productId);
+
+    List<PurchaseDetails> findAllPurchaseDetailsByPurchaseId(String purchaseId);
 }

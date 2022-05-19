@@ -1,5 +1,6 @@
 package entities;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,7 +13,7 @@ public class Purchase {
 	
 	private Supplier supplier;
 	
-	private Date purchaseDate;
+	private LocalDateTime purchaseDate;
 	
 	private String description;
 	
@@ -21,7 +22,7 @@ public class Purchase {
 	public Purchase() {
 	}
 
-	public Purchase(int id, Employee employee, Supplier supplier, Date purchaseDate, String description,
+	public Purchase(int id, Employee employee, Supplier supplier, LocalDateTime purchaseDate, String description,
 			List<Purchase> purchases) {
 		super();
 		this.id = id;
@@ -56,11 +57,11 @@ public class Purchase {
 		this.supplier = supplier;
 	}
 
-	public Date getPurchaseDate() {
+	public LocalDateTime getPurchaseDate() {
 		return purchaseDate;
 	}
 
-	public void setPurchaseDate(Date purchaseDate) {
+	public void setPurchaseDate(LocalDateTime purchaseDate) {
 		this.purchaseDate = purchaseDate;
 	}
 

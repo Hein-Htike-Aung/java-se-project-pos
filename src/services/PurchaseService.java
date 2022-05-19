@@ -1,28 +1,29 @@
 package services;
 
 import config.DBConfig;
-import entities.Employee;
-import entities.Purchase;
-import entities.PurchaseDetails;
-import entities.Supplier;
+import entities.*;
 import repositories.ProductRepo;
 import repositories.PurchaseRepo;
 import shared.mapper.PurchaseMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PurchaseService implements PurchaseRepo {
 
-    private final DBConfig dbConfig = new DBConfig();
-    private PurchaseMapper purchaseMapper;
+    private final DBConfig dbConfig;
+    private final PurchaseMapper purchaseMapper;
+    private final ProductService productService;
 
-    public void setPurchaseMapper(PurchaseMapper purchaseMapper) {
-        this.purchaseMapper = purchaseMapper;
-        this.purchaseMapper.setPurchaseRepo(new PurchaseService());
+    public PurchaseService() {
+        this.dbConfig = new DBConfig();
+        this.purchaseMapper = new PurchaseMapper();
+        this.purchaseMapper.setPurchaseRepo(this);
+        this.productService = new ProductService();
         this.purchaseMapper.setProductRepo(new ProductService());
     }
 
@@ -36,7 +37,9 @@ public class PurchaseService implements PurchaseRepo {
             ps.setString(2, String.valueOf(purchase.getDescription()));
             ps.setString(3, String.valueOf(purchase.getEmployee().getId()));
             ps.setString(4, String.valueOf(purchase.getSupplier().getId()));
+
             ps.executeUpdate();
+
             ps.close();
 
         } catch (Exception e) {
@@ -44,24 +47,56 @@ public class PurchaseService implements PurchaseRepo {
         }
     }
 
-    public void createPurchaseDetails(PurchaseDetails purchaseDetails) {
-        try {
+    public void createPurchaseDetails(List<PurchaseDetails> purchaseDetailsList) {
 
-            PreparedStatement ps = this.dbConfig.getConnection()
-                    .prepareStatement("INSERT INTO purchase_details (quantity, product_id, purchase_id) VALUES (?, ?, ?)");
+        purchaseDetailsList.forEach(pd -> {
 
-            ps.setInt(1, purchaseDetails.getQuantity());
-            ps.setInt(2, purchaseDetails.getProduct().getId());
-            ps.setInt(3, purchaseDetails.getPurchase().getId());
-            ps.executeUpdate();
-            ps.close();
+            try {
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                PreparedStatement ps = this.dbConfig.getConnection()
+                        .prepareStatement("INSERT INTO purchase_details (quantity, price, product_id, purchase_id) VALUES (?, ?, ?, ?)");
+
+                ps.setInt(1, pd.getQuantity());
+                ps.setInt(2, pd.getPrice());
+                ps.setInt(3, pd.getProduct().getId());
+                ps.setInt(4, this.getLatestPurchaseId());
+
+                ps.executeUpdate();
+
+                ps.close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Update Product Quantity , Price by raising 10 %
+            Product storedProduct = productService.findById(pd.getProduct().getId() + "");
+            storedProduct.setPrice(((pd.getPrice() / 10) + pd.getPrice()));
+            storedProduct.setQuantity(storedProduct.getQuantity() + pd.getQuantity());
+            productService.updateProduct(String.valueOf(storedProduct.getId()), storedProduct);
+        });
+
+
     }
 
-    public List<PurchaseDetails> findPurcahseDetialsListByProductId(String productId) {
+    public int getLatestPurchaseId() {
+        int id = 0;
+        try (Statement st = this.dbConfig.getConnection().createStatement()) {
+
+            String query = "SELECT purchase_id FROM Purchase ORDER BY purchase_id DESC";
+
+            ResultSet rs = st.executeQuery(query);
+            rs.next();
+            id = rs.getInt("purchase_id");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return id;
+    }
+
+    public List<PurchaseDetails> findPurchaseDetailsListByProductId(String productId) {
         List<PurchaseDetails> purchaseDetailsList = new ArrayList<>();
         try (Statement st = this.dbConfig.getConnection().createStatement()) {
 
@@ -128,6 +163,28 @@ public class PurchaseService implements PurchaseRepo {
         }
 
         return purchaseList;
+    }
+
+    public List<PurchaseDetails> findAllPurchaseDetailsByPurchaseId(String purchaseId) {
+
+        List<PurchaseDetails> purchaseDetailsList = new ArrayList<>();
+
+        try (Statement st = this.dbConfig.getConnection().createStatement()) {
+
+            String query = "SELECT * FROM purchase_details WHERE purchase_id = " + purchaseId + ";";
+
+            ResultSet rs = st.executeQuery(query);
+
+            while (rs.next()) {
+                PurchaseDetails purchaseDetails = new PurchaseDetails();
+                purchaseDetailsList.add(this.purchaseMapper.mapToPurchaseDetails(purchaseDetails, rs));
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return purchaseDetailsList;
     }
 
     @Override

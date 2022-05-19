@@ -257,6 +257,7 @@ public class EmployeeForm {
             public void actionPerformed(ActionEvent e) {
 
                 if (null != employee) {
+                    frame.setVisible(false);
                     CredentialInfoForm credentialInfoForm = new CredentialInfoForm(employee);
                     credentialInfoForm.frame.setVisible(true);
                 } else {

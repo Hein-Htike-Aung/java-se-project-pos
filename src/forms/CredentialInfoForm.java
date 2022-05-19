@@ -107,6 +107,8 @@ public class CredentialInfoForm {
                     if (!employee.getUsername().isBlank() && !employee.getPassword().isBlank()) {
                         employeeService.updateEmployee(String.valueOf(employee.getId()), employee);
                         frame.setVisible(false);
+                        EmployeeForm employeeForm = new EmployeeForm();
+                        employeeForm.frame.setVisible(true);
                     } else {
                         JOptionPane.showMessageDialog(null, "Fill required fields");
                     }
@@ -119,6 +121,9 @@ public class CredentialInfoForm {
                         if(!loggedInUserId.isBlank()) {
                             CurrentUserHolder.setLoggedInUser(employeeService.findEmployeeById(loggedInUserId));
                             JOptionPane.showMessageDialog(null, "Successfully Login");
+                            frame.setVisible(false);
+                            PurchaseEditForm purchaseEditForm = new PurchaseEditForm();
+                            purchaseEditForm.frmPurchase.setVisible(true);
                         }
                     } else {
                         JOptionPane.showMessageDialog(null, "Enter required Fields");

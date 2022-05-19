@@ -10,6 +10,8 @@ import services.ProductService;
 import services.PurchaseService;
 
 import java.sql.ResultSet;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class PurchaseMapper {
 
@@ -26,8 +28,8 @@ public class PurchaseMapper {
 
     public Purchase mapToPurchase(Purchase purchase, ResultSet rs) {
         try {
-            purchase.setId(rs.getInt("id"));
-            purchase.setPurchaseDate(rs.getDate("purchaseDate"));
+            purchase.setId(rs.getInt("purchase_id"));
+            purchase.setPurchaseDate(LocalDateTime.parse(rs.getString("purchaseDate"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")));
             purchase.setDescription(rs.getString("description"));
             Employee employee = new Employee();
             employee.setId(rs.getInt("employee_id"));
@@ -53,6 +55,7 @@ public class PurchaseMapper {
         try {
             purchaseDetails.setId(rs.getInt("pd_id"));
             purchaseDetails.setQuantity(rs.getInt("quantity"));
+            purchaseDetails.setPrice(rs.getInt("price"));
             purchaseDetails.setProduct(
                     this.productRepo.findById(String.valueOf(rs.getInt("product_id")))
             );

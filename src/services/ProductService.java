@@ -55,7 +55,7 @@ public class ProductService implements ProductRepo {
         try {
 
             PreparedStatement ps = this.dbConfig.getConnection()
-                    .prepareStatement("UPDATE product SET productName=?, price=?, quantity=?, brand_id=?, category_id=?  WHERE product_id = ?;");
+                    .prepareStatement("UPDATE product SET productName=?, price=?, quantity=?, brand_id=?, category_id=?  WHERE product_id = ?");
 
             ps.setString(1, product.getName());
             ps.setString(2, String.valueOf(product.getPrice()));
@@ -77,7 +77,7 @@ public class ProductService implements ProductRepo {
 
             // TODO: Check Validation In Sale
 
-            List<PurchaseDetails> purcahseDetialsListByProductId = this.purchaseRepo.findPurcahseDetialsListByProductId(id);
+            List<PurchaseDetails> purcahseDetialsListByProductId = this.purchaseRepo.findPurchaseDetailsListByProductId(id);
 
             if (purcahseDetialsListByProductId.size() > 0) {
                 throw new AppException("This Product cannot be deleted");
