@@ -1,5 +1,6 @@
 package services;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import entities.Product;
 import entities.PurchaseDetails;
 import repositories.ProductRepo;
@@ -9,6 +10,7 @@ import repositories.SaleRepo;
 import shared.exception.AppException;
 import shared.mapper.ProductMapper;
 
+import javax.swing.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,7 +49,9 @@ public class ProductService implements ProductRepo {
             ps.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e instanceof MySQLIntegrityConstraintViolationException)
+                JOptionPane.showMessageDialog(null, "Already Exists");
+            else e.printStackTrace();
         }
     }
 

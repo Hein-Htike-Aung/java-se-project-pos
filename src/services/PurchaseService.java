@@ -65,15 +65,16 @@ public class PurchaseService implements PurchaseRepo {
 
                 ps.close();
 
+                // Update Product Quantity and Price (by raising 10 %)
+                Product storedProduct = productService.findById(pd.getProduct().getId() + "");
+                storedProduct.setPrice(((pd.getPrice() / 10) + pd.getPrice()));
+                storedProduct.setQuantity(storedProduct.getQuantity() + pd.getQuantity());
+                productService.updateProduct(String.valueOf(storedProduct.getId()), storedProduct);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            // Update Product Quantity , Price by raising 10 %
-            Product storedProduct = productService.findById(pd.getProduct().getId() + "");
-            storedProduct.setPrice(((pd.getPrice() / 10) + pd.getPrice()));
-            storedProduct.setQuantity(storedProduct.getQuantity() + pd.getQuantity());
-            productService.updateProduct(String.valueOf(storedProduct.getId()), storedProduct);
         });
 
 

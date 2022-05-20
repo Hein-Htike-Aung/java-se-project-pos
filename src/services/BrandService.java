@@ -122,7 +122,9 @@ public class BrandService implements BrandRepo {
             ps.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e instanceof AppException)
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            else e.printStackTrace();
         }
     }
 }

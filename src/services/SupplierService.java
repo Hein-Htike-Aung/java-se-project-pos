@@ -1,5 +1,6 @@
 package services;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import config.DBConfig;
 import entities.Purchase;
 import entities.Supplier;
@@ -8,6 +9,7 @@ import repositories.SupplierRepo;
 import shared.exception.AppException;
 import shared.mapper.SupplierMapper;
 
+import javax.swing.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -122,7 +124,9 @@ public class SupplierService implements SupplierRepo {
             ps.executeUpdate();
             ps.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e instanceof AppException)
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            else e.printStackTrace();
         }
     }
 }

@@ -1,11 +1,13 @@
 package services;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import config.DBConfig;
 import entities.Employee;
 import entities.UserRole;
 import repositories.EmployeeRepo;
 import shared.mapper.EmployeeMapper;
 
+import javax.swing.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -38,7 +40,9 @@ public class EmployeeService implements EmployeeRepo {
             ps.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e instanceof MySQLIntegrityConstraintViolationException) {
+                JOptionPane.showMessageDialog(null, "Already Exists");
+            }
         }
     }
 
@@ -59,7 +63,9 @@ public class EmployeeService implements EmployeeRepo {
             ps.executeUpdate();
             ps.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e instanceof MySQLIntegrityConstraintViolationException)
+                JOptionPane.showMessageDialog(null, "Already Exists");
+            else e.printStackTrace();
         }
     }
 
